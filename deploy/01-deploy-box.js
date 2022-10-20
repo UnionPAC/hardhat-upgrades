@@ -12,19 +12,26 @@ module.exports = async ({ deployments, getNamedAccounts }) => {
     log("--------------------------------")
     const args = []
 
-    const example = await deploy("Example", {
+    const box = await deploy("Box", {
         from: deployer,
         log: true,
         args: args,
         waitConfirmations: waitBlockConfirmations,
+        proxy: {
+            proxyContract: "OpenZeppelinTransparentProxy",
+            viaAdminContract: {
+                name: "BoxProxyAdmin",
+                artifact: "BoxProxyAdmin"
+            }
+        }
     })
 
     // verify if NOT on a local network
     if (chainId != 31337 && process.env.ETHERSCAN_API_KEY) {
         log("Verifying ... please wait!")
-        await verify(example.address, args)
+        await verify(box.address, args)
     }
     log("--------------------------------")
 }
 
-module.exports.tags = ["all", "example"]
+module.exports.tags = ["all", "box"]
